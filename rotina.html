@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plano de Treino • Mobile</title>
+<style>
+/* ---------- PALETA CLEAN ---------- */
+:root{
+  --bg:#f7f9fc;
+  --surface:#ffffff;
+  --shadow:rgba(0,0,0,.08);
+  --primary:#4caf50;   /* execução */
+  --blue:#2196f3;      /* descanso   */
+  --text:#212121;
+  --muted:#757575;
+}
+
+/* ---------- RESET ---------- */
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+body{background:var(--bg);color:var(--text);line-height:1.45;display:flex;flex-direction:column;min-height:100dvh;padding:1.2rem;}
+h2{margin:1rem 0 .4rem;font-size:1.15rem;font-weight:600;color:var(--primary);}
+section{max-width:640px;width:100%;margin:auto;}
+
+/* ---------- CARD ---------- */
+.card{background:var(--surface);border-radius:8px;padding:1rem;margin-bottom:.85rem;
+      box-shadow:0 2px 4px var(--shadow);display:flex;justify-content:space-between;align-items:center;transition:.3s;}
+.card.done{opacity:.4;filter:grayscale(.4);}
+.card-title{font-size:1rem;font-weight:500;max-width:70%;}
+.card-detail{font-size:.85rem;color:var(--muted);margin-top:.25rem;}
+.card.done .card-title{text-decoration:line-through;}
+.card.done::after{content:"✔";font-size:1.4rem;color:var(--primary);margin-left:.5rem;}
+.btn-play,.ctrl-btn,#resetAll{border:none;border-radius:6px;padding:.45rem .9rem;font-size:.9rem;cursor:pointer;transition:.2s;}
+.btn-play{background:var(--primary);color:#fff;}
+.btn-play:hover{filter:brightness(.9);}
+#resetAll{background:var(--blue);color:#fff;display:block;margin:1rem auto 0;}
+#resetAll:hover{filter:brightness(.9);}
+
+/* ---------- POPUP FULLSCREEN ---------- */
+#overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+#overlay.show{display:flex;}
+#overlay::before{content:"";position:absolute;inset:0;transform:scaleY(0);transform-origin:top;background:var(--primary);z-index:-1;transition:transform 1s linear;}
+.timer-info{text-align:center;margin-bottom:1rem;}
+.timer-info h3{font-size:1.3rem;margin-bottom:.25rem;}
+.timer-info p{color:var(--muted);font-size:.95rem;}
+#countdown{font-size:3.2rem;font-weight:700;margin-bottom:1.2rem;}
+.popup-controls{display:flex;gap:1rem;}
+.ctrl-btn{background:var(--surface);color:var(--text);border:1px solid var(--muted);}
+.ctrl-btn:hover{background:var(--bg);}
+
+/* ---------- AGENDA TABLE ---------- */
+.schedule-table{width:100%;border-collapse:collapse;font-size:.95rem;}
+.schedule-table thead th{padding:.45rem 0;border-bottom:2px solid var(--shadow);}
+.schedule-table tbody td{padding:.4rem 0;border-bottom:1px solid var(--shadow);}
+.schedule-table tbody tr:nth-child(even){background:rgba(0,0,0,.03);}
+
+@media(min-width:600px){
+  h2{font-size:1.25rem;}
+  .card-title{font-size:1.05rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ======= AGENDA SEMANAL ======= -->
+<section id="schedule">
+  <h2 style="margin-top:0">Agenda Semanal</h2>
+  <div class="card">
+    <table class="schedule-table">
+      <thead><tr><th>Dia</th><th>Atividade</th><th>Horário</th></tr></thead>
+      <tbody>
+        <tr><td>Segunda</td><td>EMS</td><td>19:00</td></tr>
+        <tr><td>Terça</td><td>Treino A – Academia</td><td>Manhã (≤45&nbsp;min)</td></tr>
+        <tr><td>Quarta</td><td>Descanso / Caminhada</td><td>—</td></tr>
+        <tr><td>Quinta</td><td>EMS</td><td>19:00</td></tr>
+        <tr><td>Sexta</td><td>Treino B – Academia</td><td>Manhã (≤45&nbsp;min)</td></tr>
+        <tr><td>Sábado</td><td>Treino C – Academia</td><td>Manhã (≤45&nbsp;min)</td></tr>
+        <tr><td>Domingo</td><td>Descanso</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ======= TREINOS ======= -->
+<section id="workouts">
+  <!-- -------- TREINO A -------- -->
+  <h2>Treino A – Terça (Força)</h2>
+
+  <div class="card" data-sets="3" data-work="45" data-rest="90">
+    <div><div class="card-title">Agachamento</div></div>
+    <button class="btn-play">▶ Play</button>
+  </div>
+
+  <!-- … (demais cartões continuam iguais) … -->
+
+  <!-- -------- TREINO B • CARTÕES -------- -->
+  <!-- (Todos os cartões de B e C mantidos) -->
+
+  <button id="resetAll">Resetar Progresso</button>
+</section>
+
+<!-- ---------- POPUP ---------- -->
+<div id="overlay">
+  <div class="timer-info">
+    <h3 id="exName">Exercício</h3>
+    <p id="setInfo">Set 1 de 3</p>
+  </div>
+  <div id="countdown">00:00</div>
+  <div class="popup-controls">
+    <button class="ctrl-btn" id="pauseBtn">❚❚ Pausar</button>
+    <button class="ctrl-btn" id="closeBtn">✕ Fechar</button>
+  </div>
+</div>
+
+<script>
+/* ---------- ELEMENTOS ---------- */
+const workoutCards = document.querySelectorAll('#workouts .card');   // apenas cartões de treino
+const overlay   = document.getElementById('overlay');
+const exName    = document.getElementById('exName');
+const setInfo   = document.getElementById('setInfo');
+const countdown = document.getElementById('countdown');
+const pauseBtn  = document.getElementById('pauseBtn');
+const closeBtn  = document.getElementById('closeBtn');
+const resetBtn  = document.getElementById('resetAll');
+
+/* ---------- VARIÁVEIS ---------- */
+let interval, paused=false,
+    phase='pre', currentSet=1, totalSets=0,
+    workSec=0, restSec=0, currentTime=0,
+    activeCard=null;
+
+/* ---------- UTILS ---------- */
+const secToMMSS = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+
+function updateBar(){
+  const total = phase==='work'?workSec : phase==='rest'?restSec : 1;
+  const frac  = phase==='pre'?0 : 1 - currentTime/total;      // 0→1
+  overlay.style.setProperty('--scale', frac);
+  overlay.style.setProperty('--origin', phase==='rest' ? 'bottom' : 'top');
+  overlay.style.setProperty('--color', phase==='work' ? 'var(--primary)' : 'var(--blue)');
+}
+
+/* ---------- DETALHES AUTOMÁTICOS ---------- */
+workoutCards.forEach(c=>{
+  const {sets,work,rest}=c.dataset;
+  const detail=document.createElement('div');
+  detail.className='card-detail';
+  detail.textContent=`${sets} séries · ${work}s exec / ${rest}s desc`;
+  c.querySelector('.card-title').after(detail);
+});
+
+/* ---------- FLUXO PRINCIPAL ---------- */
+function startTimer(card){
+  activeCard = card;
+  ({sets:totalSets,work:workSec,rest:restSec}=card.dataset);
+  totalSets=+totalSets; workSec=+workSec; restSec=+restSec;
+  currentSet=1; phase='pre';
+  exName.textContent = card.querySelector('.card-title').textContent;
+  overlay.classList.add('show');
+  paused=false; pauseBtn.textContent='❚❚ Pausar';
+  runPhase();
+}
+
+function runPhase(){
+  currentTime = phase==='pre'?5 : phase==='work'?workSec : restSec;
+  setInfo.textContent =
+    phase==='pre' ? 'Prepare-se' :
+    `Set ${currentSet} de ${totalSets} · ${phase==='work'?'Execução':'Descanso'}`;
+  updateBar();
+  countdown.textContent = secToMMSS(currentTime);
+  clearInterval(interval);
+  interval=setInterval(tick,1000);
+}
+
+function tick(){
+  if(paused) return;
+  currentTime--;
+  updateBar();
+  countdown.textContent = secToMMSS(currentTime);
+  if(currentTime<=0){
+    clearInterval(interval);
+    if(phase==='pre'){ phase='work'; runPhase(); }
+    else if(phase==='work' && restSec>0){ phase='rest'; runPhase(); }
+    else{
+      if(phase==='rest' || restSec===0) currentSet++;
+      if(currentSet>totalSets) finishExercise();
+      else{ phase='pre'; runPhase(); }
+    }
+  }
+}
+
+function finishExercise(){
+  activeCard.classList.add('done');
+  overlay.classList.remove('show');
+}
+
+/* ---------- EVENTOS ---------- */
+workoutCards.forEach(c=>{
+  const btn=c.querySelector('.btn-play');
+  if(btn) btn.addEventListener('click',()=>startTimer(c));
+});
+pauseBtn.addEventListener('click',()=>{
+  paused=!paused;
+  pauseBtn.textContent = paused ? '► Continuar' : '❚❚ Pausar';
+});
+closeBtn.addEventListener('click',()=>{
+  clearInterval(interval);
+  overlay.classList.remove('show');
+});
+resetBtn.addEventListener('click',()=>workoutCards.forEach(c=>c.classList.remove('done')));
+
+/* ---------- BAR CSS DINÂMICO ---------- */
+const dyn=document.createElement('style');
+dyn.textContent=`#overlay::before{transform-origin:var(--origin,top);
+  transform:scaleY(var(--scale,0));background:var(--color,var(--primary));}`;
+document.head.appendChild(dyn);
+</script>
+</body>
+</html>
