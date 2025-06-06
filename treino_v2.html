@@ -1,0 +1,335 @@
+<!-- treino-diario.html — página SPA mobile-first para acompanhamento de treinos -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Acompanhamento de Treino Diário</title>
+
+<!-- ====== CSS ====== -->
+<style>
+:root{
+  --bg:#f7f9fb;
+  --card:#ffffff;
+  --primary:#0e77cc;
+  --primary-dark:#1a3666;
+  --accent:#33db89;
+  --text:#222;
+  --radius:12px;
+  --gap:.75rem;
+  font-family:system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);line-height:1.4}
+header{position:sticky;top:0;z-index:10;background:var(--card);
+       padding:1rem;border-bottom:1px solid #e5e5e5}
+h1{font-size:1.25rem;text-align:center;color:var(--primary-dark)}
+nav{display:flex;gap:.5rem;margin-top:var(--gap);overflow-x:auto}
+nav button{flex:1;min-width:2.5rem;padding:.5rem;border:none;border-radius:var(--radius);
+           background:#e8eef2;color:var(--primary-dark);font-weight:600;white-space:nowrap;cursor:pointer}
+nav button.active{background:var(--primary);color:#fff}
+
+main{padding:1rem;display:flex;flex-direction:column;gap:var(--gap)}
+
+.card{background:var(--card);border-radius:var(--radius);padding:1rem;
+      box-shadow:0 2px 4px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.5rem}
+.header-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+.badge{background:var(--accent);color:#fff;border-radius:999px;padding:.25rem .6rem;font-size:.75rem;font-weight:600}
+
+progress{width:100%;height:.5rem;border:none;border-radius:8px;background:#e5e5e5}
+progress::-webkit-progress-value{background:var(--primary);border-radius:8px}
+
+.controls{display:flex;gap:.5rem}
+button.action{flex:1;padding:.55rem;border:none;border-radius:var(--radius);font-weight:600;cursor:pointer}
+.start{background:var(--primary);color:#fff}
+.pause{background:#ffb703;color:#000}
+.done{background:var(--accent);color:#fff}
+.timer{font-variant-numeric:tabular-nums;font-weight:600}
+
+ul.ex-list{margin-left:1rem;display:grid;row-gap:.25rem;list-style:disc}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Treino Diário</h1>
+  <nav id="dayTabs"></nav>
+</header>
+
+<main id="workoutArea"></main>
+
+<!-- ====== JS ====== -->
+<script>
+// ---------- Programa semanal ----------
+const schedule = {
+  Segunda: [
+    { name: "Sessão EMS", type: "time", duration: 20 * 60, sets: 1 }
+  ],
+
+  Terça: [
+    { superset: "A1", name: "Supino halteres",      type: "reps", reps: "8-12",  sets: 3, rest: 60 },
+    { superset: "A2", name: "Prancha toque ombro",   type: "reps", reps: "12",    sets: 3, rest: 60 },
+    { superset: "B1", name: "Desenvolvimento militar", type: "reps", reps: "8-12", sets: 3, rest: 60 },
+    { superset: "B2", name: "Hollow hold",           type: "time", duration: 30,  sets: 3, rest: 60 },
+    { superset: "C1", name: "Fundos em banco",       type: "reps", reps: "8-12",  sets: 3, rest: 60 },
+    { superset: "C2", name: "Ab-wheel rollout",      type: "reps", reps: "8-10",  sets: 3, rest: 60 }
+  ],
+
+  Quarta: [
+    { superset: "A1", name: "Agachamento livre",     type: "reps", reps: "8-10",     sets: 3, rest: 60 },
+    { superset: "A2", name: "Face pull",             type: "reps", reps: "15",       sets: 3, rest: 60 },
+    { superset: "B1", name: "RDL",                   type: "reps", reps: "8-10",     sets: 3, rest: 60 },
+    { superset: "B2", name: "Bird-dog",              type: "reps", reps: "12/lado",  sets: 3, rest: 60 },
+    { superset: "C1", name: "Remada curvada",        type: "reps", reps: "8-12",     sets: 3, rest: 60 },
+    { superset: "C2", name: "Panturrilha em pé",     type: "reps", reps: "15",       sets: 3, rest: 60 }
+  ],
+
+  Quinta: [
+    { name: "Sessão EMS", type: "time", duration: 20 * 60, sets: 1 }
+  ],
+
+  Sexta: [
+    { name: "Mobilidade / caminhada", type: "time", duration: 30 * 60, sets: 1 }
+  ],
+
+  Sábado: {
+    mode: "emom",
+    rounds: 5,
+    minute: 60,           // 60 s por estação
+    exercises: [
+      { name: "Kettlebell swing", reps: "15" },
+      { name: "Push-up",          reps: "12" },
+      { name: "Goblet squat",     reps: "15" },
+      { name: "Remada TRX",       reps: "12" },
+      { name: "Jump rope",        reps: "40 s" },
+      { name: "Descanso",         reps: "—" }
+    ]
+  },
+
+  Domingo: []             // descanso total
+};
+
+// ---------- Abas de dias ----------
+const dayTabs     = document.getElementById('dayTabs');
+const workoutArea = document.getElementById('workoutArea');
+const dias        = Object.keys(schedule);
+
+dias.forEach((dia, idx) => {
+  const btn = document.createElement('button');
+  btn.textContent = dia.slice(0,3);
+  if (idx === new Date().getDay()) btn.classList.add('active');
+
+  btn.addEventListener('click', () => {
+    [...dayTabs.children].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderDay(dia);
+  });
+
+  dayTabs.appendChild(btn);
+});
+
+// exibe o dia corrente ao abrir
+renderDay(dias[new Date().getDay()]);
+
+// ---------- Renderização ----------
+function renderDay(dia) {
+  workoutArea.innerHTML = '';
+  const plan = schedule[dia];
+
+  if (Array.isArray(plan)) {        // treino normal
+    if (!plan.length) {
+      workoutArea.innerHTML = '<p>Nenhum treino 🙌</p>';
+      return;
+    }
+    plan.forEach(ex => workoutArea.appendChild(createCard(ex)));
+  } else if (plan.mode === 'emom') { // EMOM
+    workoutArea.appendChild(createEmomCard(plan));
+  }
+}
+
+// ---------- Cartão de exercício padrão ----------
+function createCard(ex) {
+  let state = 'idle',
+      currentSet = 0,
+      timeLeft = ex.duration || 0,
+      timerId = null,
+      restId  = null;
+
+  const card   = el('div','card');
+  const header = el('div','header-row');
+  const title  = el('h3'); title.textContent = ex.name;
+
+  if (ex.superset) {
+    const badge = el('span','badge'); badge.textContent = ex.superset;
+    header.append(title, badge);
+  } else {
+    header.appendChild(title);
+  }
+
+  const info = el('p');
+  info.innerHTML = ex.type === 'time'
+      ? `${ex.sets}×${ex.duration}s`
+      : `${ex.sets}×${ex.reps}`;
+
+  const prog = document.createElement('progress');
+  prog.max   = ex.sets;
+  prog.value = 0;
+
+  // botões
+  const controls = el('div','controls');
+  const btnS = btn('Iniciar','start');
+  const btnP = btn('Pausar','pause'); btnP.disabled = true;
+  const btnD = btn('✔','done');      btnD.disabled = true;
+  const lbl  = el('span','timer');
+
+  btnS.onclick = () => {
+    if (state === 'running') return;
+
+    // cancela descanso se estiver rolando
+    if (state === 'rest') {
+      clearInterval(restId);
+      restId = null;
+      lbl.textContent = '';
+    }
+
+    if (currentSet >= ex.sets) return;
+
+    state = 'running';
+    btnS.disabled = true; btnP.disabled = false; btnD.disabled = false;
+
+    if (ex.type === 'time') {
+      timeLeft = ex.duration;
+      lbl.textContent = fmt(timeLeft);
+      timerId = setInterval(() => {
+        timeLeft--;
+        lbl.textContent = fmt(timeLeft);
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          finishSet();
+        }
+      }, 1000);
+    } else {
+      lbl.textContent = `Reps: ${ex.reps}`;
+    }
+  };
+
+  btnP.onclick = () => {
+    if (state !== 'running') return;
+    state = 'paused';
+    clearInterval(timerId);
+    btnS.disabled = false; btnP.disabled = true;
+  };
+
+  btnD.onclick = finishSet;
+
+  function finishSet() {
+    if (state === 'idle') return;
+
+    clearInterval(timerId);
+    timerId = null;
+
+    currentSet++;
+    prog.value = currentSet;
+
+    if (currentSet >= ex.sets) {
+      state = 'done';
+      [btnS,btnP,btnD].forEach(b => b.disabled = true);
+      lbl.textContent = '✔';
+    } else {
+      state = 'rest';
+      btnS.disabled = false; btnP.disabled = true; btnD.disabled = true;
+
+      let rest = ex.rest || 60;
+      lbl.textContent = `Descanso: ${fmt(rest)}`;
+      restId = setInterval(() => {
+        rest--;
+        lbl.textContent = `Descanso: ${fmt(rest)}`;
+        if (rest <= 0) {
+          clearInterval(restId);
+          restId = null;
+          btnS.click();   // inicia próximo set automaticamente
+        }
+      }, 1000);
+    }
+  }
+
+  controls.append(btnS,btnP,btnD,lbl);
+  card.append(header,info,prog,controls);
+  return card;
+}
+
+// ---------- Cartão EMOM ----------
+function createEmomCard(plan) {
+  const totalSecs = plan.rounds * plan.minute * plan.exercises.length;
+  let timeLeft = totalSecs,
+      state    = 'idle',
+      timerId  = null;
+
+  const card   = el('div','card');
+  const header = el('div','header-row');
+  const title  = el('h3'); title.textContent = `Circuito EMOM – ${plan.rounds} rodadas`;
+  header.appendChild(title);
+
+  const info = el('p'); info.textContent = `Tempo total: ${Math.floor(totalSecs/60)} min`;
+
+  const list = el('ul','ex-list');
+  plan.exercises.forEach((ex,i) => {
+    const li = document.createElement('li');
+    li.textContent = `${i+1}. ${ex.name} – ${ex.reps}`;
+    list.appendChild(li);
+  });
+
+  // controles
+  const controls = el('div','controls');
+  const btnS = btn('Iniciar','start');
+  const btnP = btn('Pausar','pause'); btnP.disabled = true;
+  const lbl  = el('span','timer');    controls.append(btnS,btnP,lbl);
+
+  btnS.onclick = () => {
+    if (state === 'running') return;
+    state = 'running';
+    btnS.disabled = true; btnP.disabled = false;
+
+    lbl.textContent = fmt(timeLeft);
+    timerId = setInterval(() => {
+      timeLeft--;
+      lbl.textContent = fmt(timeLeft);
+      if (timeLeft <= 0) {
+        clearInterval(timerId);
+        state = 'done';
+        lbl.textContent = '✔';
+        btnP.disabled = true;
+      }
+    }, 1000);
+  };
+
+  btnP.onclick = () => {
+    if (state !== 'running') return;
+    state = 'paused';
+    clearInterval(timerId);
+    btnS.disabled = false; btnP.disabled = true;
+  };
+
+  card.append(header,info,list,controls);
+  return card;
+}
+
+// ---------- utilitários ----------
+function el(tag, cls='') {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  return n;
+}
+function btn(txt, cls) {
+  const b = el('button',`action ${cls}`);
+  b.textContent = txt;
+  return b;
+}
+function fmt(s) {
+  const m  = String(Math.floor(s/60)).padStart(2,'0');
+  const ss = String(s%60).padStart(2,'0');
+  return `${m}:${ss}`;
+}
+</script>
+</body>
+</html>
