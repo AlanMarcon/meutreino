@@ -141,6 +141,17 @@
             padding: 1.25rem;
         }
 
+        .circuit-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .circuit-card li {
+            background-color: var(--secondary-color);
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
         .superset-header h4 {
             margin: 0 0 1rem 0;
             font-size: 1.2rem;
@@ -264,7 +275,7 @@
         
         .timer-display.in-visual {
             position: absolute;
-            top: 39%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 4rem;
@@ -275,6 +286,14 @@
         .timer-display.resting {
             color: var(--rest-color);
         }
+
+        .countdown-progress.emom {
+             stroke: var(--accent-color);
+        }
+        .timer-display.emom {
+            color: var(--accent-color);
+        }
+
 
         .workout-reps {
             font-size: 2.5rem;
@@ -402,19 +421,26 @@
             "program": [
                 { "day": "Monday", "session": "EMS", "type": "EMS", "time_minutes": 20, "notes": "Sessão de eletroestimulação guiada em estúdio.", "exercises": [] },
                 { "day": "Tuesday", "session": "Treino A – Push & Core", "type": "Strength Supersets", "time_minutes": 45, "supersets": [
-                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Dumbbell Bench Press", "reps": "8-12", "description": "Supino com halteres focado em peito e ombros.", "media": "https://placehold.co/400x400.gif?text=Bench+Press+GIF" }, { "name": "Plank Shoulder Tap", "reps": 12, "description": "Prancha alta tocando os ombros; core anti-rotação.", "media": "https://placehold.co/400x400.gif?text=Plank+Tap+GIF" } ] },
-                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Overhead Press", "reps": "8-12", "description": "Desenvolvimento militar em pé.", "media": "https://placehold.co/400x400.gif?text=OHP+GIF" }, { "name": "Hollow Hold", "reps": "30s", "description": "Isometria em hollow para core.", "media": "https://placehold.co/400x400.gif?text=Hollow+Hold+GIF" } ] },
-                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Parallel Bar Dips (or Bench Dips)", "reps": "8-12", "description": "Tríceps e peito.", "media": "https://placehold.co/400x400.gif?text=Dips+GIF" }, { "name": "Ab Wheel Rollout", "reps": "8-10", "description": "Rolamento de roda para core.", "media": "https://placehold.co/400x400.gif?text=Ab+Wheel+GIF" } ] }
+                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Dumbbell Bench Press", "reps": "8-12", "description": "Supino com halteres focado em peito e ombros.", "media": "https://images.squarespace-cdn.com/content/v1/54f9e84de4b0d13f30bba4cb/1526590877144-BYR9X8ZX5FROTGOZ2VHL/DSC_6330.mov.gif" }, { "name": "Plank Shoulder Tap", "reps": 12, "description": "Prancha alta tocando os ombros; core anti-rotação.", "media": "https://d24bnpykhxwj9p.cloudfront.net/s3file/s3fs-public/users1/2017-11/Tue/shoulder%20tap.gif" } ] },
+                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Overhead Press", "reps": "8-12", "description": "Desenvolvimento militar em pé.", "media": "https://149874912.v2.pressablecdn.com/wp-content/uploads/2020/12/Overhead-press-exercise.gif" }, { "name": "Hollow Hold", "reps": "30s", "description": "Isometria em hollow para core.", "media": "https://experiencelife.lifetime.life/wp-content/uploads/2021/03/EL_BID_HollowHold.gif" } ] },
+                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Parallel Bar Dips (or Bench Dips)", "reps": "8-12", "description": "Tríceps e peito.", "media": "https://i0.wp.com/www.strengthlog.com/wp-content/uploads/2023/03/bench-dips.gif?resize=600%2C600&ssl=1" }, { "name": "Body-Saw PLank", "reps": "45s", "description": "Prancha com deslize.", "media": "https://media.self.com/photos/5c93d4df23ccbc4420bd90a8/master/w_320%2Cc_limit/body-saw-with-gliders-Amanda_066.gif" } ] }
                 ]},
                 { "day": "Wednesday", "session": "Treino B – Lower & Pull", "type": "Strength Supersets", "time_minutes": 45, "supersets": [
-                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Barbell Back Squat", "reps": "8-10", "description": "Agachamento livre.", "media": "https://placehold.co/400x400.gif?text=Squat+GIF" }, { "name": "Face Pull (Band/Cable)", "reps": 15, "description": "Estabilidade escapular.", "media": "https://placehold.co/400x400.gif?text=Face+Pull+GIF" } ] },
-                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Romanian Deadlift", "reps": "8-10", "description": "Posterior de coxa e glúteos.", "media": "https://placehold.co/400x400.gif?text=RDL+GIF" }, { "name": "Bird-Dog", "reps": "12/lado", "description": "Core anti-rotação.", "media": "https://placehold.co/400x400.gif?text=Bird-Dog+GIF" } ] },
-                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Bent-Over Row", "reps": "8-12", "description": "Dorsais e bíceps.", "media": "https://placehold.co/400x400.gif?text=Row+GIF" }, { "name": "Standing Calf Raise", "reps": 15, "description": "Panturrilhas.", "media": "https://placehold.co/400x400.gif?text=Calf+Raise+GIF" } ] }
+                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Barbell Back Squat", "reps": "8-10", "description": "Agachamento livre.", "media": "https://149874912.v2.pressablecdn.com/wp-content/uploads/2021/11/squat.gif" }, { "name": "Face Pull (Band/Cable)", "reps": 15, "description": "Estabilidade escapular.", "media": "https://149874912.v2.pressablecdn.com/wp-content/uploads/2020/05/face-pull.gif" } ] },
+                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Romanian Deadlift", "reps": "8-10", "description": "Posterior de coxa e glúteos.", "media": "https://149874912.v2.pressablecdn.com/wp-content/uploads/2022/01/Romanian-deadlift.gif" }, { "name": "Bird-Dog", "reps": "12/lado", "description": "Core anti-rotação.", "media": "https://media.post.rvohealth.io/wp-content/uploads/sites/2/2021/02/NarrowVibrantHawk-size_restricted.gif" } ] },
+                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Bent-Over Row", "reps": "8-12", "description": "Dorsais e bíceps.", "media": "https://i0.wp.com/www.strengthlog.com/wp-content/uploads/2022/03/Barbell-Row.gif" }, { "name": "Standing Calf Raise", "reps": 15, "description": "Panturrilhas.", "media": "https://cdn.jefit.com/assets/img/exercises/gifs/142.gif" } ] }
                 ]},
                 { "day": "Thursday", "session": "EMS", "type": "EMS", "time_minutes": 20, "notes": "Sessão de eletroestimulação guiada.", "exercises": [] },
                 { "day": "Friday", "session": "Active Recovery", "type": "Recovery", "time_minutes": 30, "notes": "Alongamentos, liberação miofascial ou caminhada leve.", "exercises": [] },
-                { "day": "Saturday", "session": "Treino C – Full-Body Metabólico", "type": "EMOM Circuit", "time_minutes": 35, "circuit": { "format": "EMOM", "rounds": 5, "work_seconds": 45, "rest_seconds": 15, "exercises": [ {"name": "Kettlebell Swing", "reps": 15}, {"name": "Push-Up", "reps": 12}, {"name": "Goblet Squat", "reps": 15}, {"name": "TRX Row", "reps": 12}, {"name": "Jump Rope", "duration": "40s"}, {"name": "Rest / Adjust load", "duration": "15s"} ] } },
-                { "day": "Sunday", "session": "Rest", "type": "Rest", "notes": "Recuperação total.", "exercises": [] }
+                { "day": "Saturday", "session": "Treino C – Full-Body Metabólico", "type": "EMOM Circuit", "time_minutes": 35, "circuit": { "format": "EMOM", "rounds": 5, "duration_per_exercise_seconds": 60, "exercises": [ 
+                    {"name": "Kettlebell Swing", "reps": 15, "media": "https://media.tenor.com/gJGN16fm_doAAAAC/kettlebell-swing.gif"}, 
+                    {"name": "Push-Up", "reps": "Max", "media": "https://www.inspireusafoundation.org/wp-content/uploads/2022/08/push-up.gif"}, 
+                    {"name": "Goblet Squat", "reps": 15, "media": "https://www.inspireusafoundation.org/wp-content/uploads/2022/10/goblet-squat.gif"}, 
+                    {"name": "TRX Row", "reps": "Max", "media": "https://i.pinimg.com/originals/a1/b0/c6/a1b0c6606519123e49176885348874fb.gif"}, 
+                    {"name": "Jump Rope", "duration": "45s", "media": "https://media.self.com/photos/59235d64a8524634b47c0b78/master/w_320%2Cc_limit/jump-rope.gif"}, 
+                    {"name": "Rest", "duration": "60s"} 
+                ] } },
+                { "day": "Sunday", "session": "Rest", "type": "Rest", "notes": "Recuperação total. Good job this week!", "exercises": [] }
             ]
         };
 
@@ -423,11 +449,21 @@
             currentView: 'weekly-view',
             selectedDay: null,
             workout: {
+                // Shared
                 active: false,
+                type: null, // 'superset' or 'emom'
+                
+                // Superset state
                 isResting: false,
                 supersetIndex: 0,
                 exerciseIndex: 0,
                 set: 1,
+
+                // EMOM state
+                isPaused: false,
+                currentRound: 0,
+                currentMinute: 0,
+                emomTimeLeft: 0
             },
             timer: {
                 interval: null,
@@ -503,9 +539,32 @@
                         </div>`;
                 });
                 html += `<button class="start-workout-btn" id="start-workout-btn">Start Workout</button>`;
-            } else {
+            } 
+            else if (day.type === "EMOM Circuit" && day.circuit) {
+                const circuit = day.circuit;
+                html += `
+                    <div class="circuit-card">
+                         <div class="superset-header">
+                            <h4>${circuit.format} Details</h4>
+                            <div class="superset-header-info">
+                                <span>${circuit.rounds} ROUNDS</span>
+                                <span>${circuit.duration_per_exercise_seconds}s PER EXERCISE</span>
+                            </div>
+                        </div>
+                        <ul>
+                            ${(circuit.exercises || []).map((ex, index) => `<li>Minute ${index + 1}: <strong>${ex.name}</strong></li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                html += `<button class="start-workout-btn" id="start-workout-btn">Start Workout</button>`;
+            }
+            else if (day.notes) {
+                 html += `<div class="session-details"><p>${day.notes}</p></div>`;
+            }
+            else {
                  html += `<div class="session-notes"><p>No workout details available.</p></div>`;
             }
+
             views.session.innerHTML = html;
             
             document.getElementById('back-to-week-btn').addEventListener('click', () => navigateTo('weekly-view'));
@@ -514,8 +573,26 @@
                 startBtn.addEventListener('click', startWorkout);
             }
         }
-
+        
+        // --- WORKOUT VIEW ROUTER ---
         function renderWorkoutView() {
+            // No longer clear interval here, let the specific workout logic handle it
+            // clearInterval(state.timer.interval);
+            switch (state.workout.type) {
+                case 'superset':
+                    renderSupersetWorkout();
+                    break;
+                case 'emom':
+                    renderEmomWorkout();
+                    break;
+                default:
+                    // If workout is active but type is unknown, end it.
+                    endWorkout();
+            }
+        }
+        
+        // --- SUPERSET WORKOUT ---
+        function renderSupersetWorkout() {
             clearInterval(state.timer.interval);
             const day = state.selectedDay;
 
@@ -533,7 +610,7 @@
             const exercise = superset?.exercises?.[state.workout.exerciseIndex];
             
             if (!exercise) {
-                endWorkout();
+                renderCompletionScreen();
                 return;
             }
 
@@ -549,7 +626,7 @@
                     <p class="workout-progress">${progressText}</p>
                     <h3 class="workout-exercise-name">${exercise.name}</h3>
                     ${exercise.media ? `<button class="show-media-btn" id="show-media-btn">Show Example</button>` : ''}
-                `;
+                    `;
 
             if (isTimed) {
                 const duration = parseInt(exercise.reps);
@@ -586,7 +663,59 @@
             }
         }
 
+        // --- EMOM WORKOUT ---
+        function renderEmomWorkout() {
+            const day = state.selectedDay;
+            const circuit = day.circuit;
+            const totalMinutes = circuit.exercises.length * circuit.rounds;
+            const currentOverallMinute = state.workout.currentRound * circuit.exercises.length + state.workout.currentMinute;
+            
+            if (currentOverallMinute >= totalMinutes) {
+                renderCompletionScreen();
+                return;
+            }
+
+            const exercise = circuit.exercises[state.workout.currentMinute];
+
+            let html = `
+                <div class="workout-view">
+                    <div class="session-header">
+                        <button class="back-button" id="back-to-session-btn">&lsaquo;</button>
+                        <div class="session-title"><h2>${circuit.format}</h2></div>
+                    </div>
+                    <p class="workout-progress">Round ${state.workout.currentRound + 1} of ${circuit.rounds} | Minute ${currentOverallMinute + 1} of ${totalMinutes}</p>
+                    <h3 class="workout-exercise-name">${exercise.name}</h3>
+                    ${exercise.media ? `<button class="show-media-btn" id="show-media-btn">Show Example</button>` : ''}
+                    
+                    <div class="timer-visual-container">
+                        <svg class="countdown-svg">
+                            <circle class="countdown-bg" cx="100" cy="100" r="90"></circle>
+                            <circle class="countdown-progress emom" id="countdown-progress-circle" cx="100" cy="100" r="90"></circle>
+                        </svg>
+                        <div class="timer-display in-visual emom" id="emom-timer-display">${state.workout.emomTimeLeft}</div>
+                    </div>
+
+                    <div class="workout-controls">
+                        <button class="workout-btn main-action-btn" id="emom-control-btn">${state.workout.isPaused ? "Resume" : "Pause"}</button>
+                    </div>
+                    <button class="finish-workout-btn" id="end-workout-btn">End Workout</button>
+                </div>`;
+
+            views.workout.innerHTML = html;
+            
+            updateEmomTimerVisual(state.workout.emomTimeLeft, circuit.duration_per_exercise_seconds);
+            
+            document.getElementById('back-to-session-btn').addEventListener('click', endWorkout);
+            document.getElementById('end-workout-btn').addEventListener('click', endWorkout);
+            document.getElementById('emom-control-btn').addEventListener('click', toggleEmomPause);
+            
+            const showMediaBtn = document.getElementById('show-media-btn');
+            if(showMediaBtn) showMediaBtn.addEventListener('click', () => openMediaModal(exercise.media));
+        }
+
+
         function renderRestScreen(duration) {
+            clearInterval(state.timer.interval);
             let html = `
                 <div class="workout-view">
                     <p class="workout-progress">Next set coming up...</p>
@@ -611,22 +740,29 @@
         }
         
         function renderCompletionScreen() {
+             clearInterval(state.timer.interval);
              let html = `
                 <div class="workout-view">
                     <h3 class="workout-exercise-name">Workout Complete!</h3>
                     <p class="workout-progress">Great job!</p>
-                     <div class="workout-controls">
-                        <button class="workout-btn main-action-btn" id="back-to-home-btn">Done</button>
-                    </div>
+                       <div class="workout-controls">
+                            <button class="workout-btn main-action-btn" id="back-to-home-btn">Done</button>
+                       </div>
                 </div>`;
             views.workout.innerHTML = html;
-            document.getElementById('back-to-home-btn').addEventListener('click', () => navigateTo('weekly-view'));
+            document.getElementById('back-to-home-btn').addEventListener('click', () => {
+                resetWorkoutState();
+                navigateTo('weekly-view');
+            });
         }
 
         // --- NAVIGATION ---
         function navigateTo(viewId) {
             state.currentView = viewId;
-            clearInterval(state.timer.interval);
+            // Only clear timer if not navigating to the workout view itself
+            if (viewId !== 'workout-view') {
+                 clearInterval(state.timer.interval);
+            }
             
             for (const key in views) {
                 views[key].classList.toggle('active', key === viewId.replace('-view', ''));
@@ -653,6 +789,7 @@
                 timeLeft--;
                 if(timerDisplay) timerDisplay.textContent = timeLeft;
                 if (timeLeft <= 0) {
+                    clearInterval(state.timer.interval);
                     nextExercise();
                 }
             }, 1000);
@@ -660,51 +797,119 @@
 
         function startRestTimer(duration) {
             clearInterval(state.timer.interval);
-
-            const progressCircle = document.getElementById('countdown-progress-circle');
-            const timerDisplay = document.getElementById('rest-timer-display');
-            if (!progressCircle || !timerDisplay) return;
-
-            const radius = progressCircle.r.baseVal.value;
-            const circumference = 2 * Math.PI * radius;
             let timeLeft = duration;
+            
+            updateRestTimerVisual(timeLeft, duration); // Initial paint
 
-            progressCircle.style.strokeDasharray = circumference;
-            progressCircle.style.strokeDashoffset = 0;
-            
-            // Trigger the animation on the next frame
-            requestAnimationFrame(() => {
-                progressCircle.style.transition = `stroke-dashoffset ${duration}s linear`;
-                progressCircle.style.strokeDashoffset = circumference;
-            });
-            
             state.timer.interval = setInterval(() => {
-                timeLeft--;
-                if(timerDisplay) timerDisplay.textContent = timeLeft;
+                const timerDisplay = document.getElementById('rest-timer-display');
+                if (!timerDisplay) {
+                    clearInterval(state.timer.interval);
+                    return;
+                };
+
+                updateRestTimerVisual(timeLeft, duration);
+                timerDisplay.textContent = timeLeft;
+
                 if (timeLeft <= 0) {
+                    clearInterval(state.timer.interval);
                     skipRest();
                 }
+                timeLeft--;
             }, 1000);
         }
+        
+        function startEmomTimer() {
+            clearInterval(state.timer.interval);
+            const circuit = state.selectedDay.circuit;
+
+            // Initial paint for the new minute
+            updateEmomTimerVisual(state.workout.emomTimeLeft, circuit.duration_per_exercise_seconds);
+            const timerDisplay = document.getElementById('emom-timer-display');
+            if (timerDisplay) timerDisplay.textContent = state.workout.emomTimeLeft;
+
+
+            state.timer.interval = setInterval(() => {
+                if(state.workout.isPaused) return;
+                
+                if (state.workout.emomTimeLeft <= 0) {
+                    nextEmomMinute();
+                    return;
+                }
+
+                updateEmomTimerVisual(state.workout.emomTimeLeft, circuit.duration_per_exercise_seconds);
+                const currentTimerDisplay = document.getElementById('emom-timer-display');
+                if (currentTimerDisplay) currentTimerDisplay.textContent = state.workout.emomTimeLeft;
+                
+                state.workout.emomTimeLeft--;
+
+            }, 1000);
+        }
+        
+        function updateRestTimerVisual(timeLeft, duration) {
+            const progressCircle = document.getElementById('countdown-progress-circle');
+            if (!progressCircle) return;
+            const radius = progressCircle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (timeLeft / duration) * circumference;
+
+            progressCircle.style.strokeDasharray = circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        function updateEmomTimerVisual(timeLeft, duration) {
+            const progressCircle = document.getElementById('countdown-progress-circle');
+            if (!progressCircle) return;
+            const radius = progressCircle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            // Use the same robust formula as the rest timer
+            const offset = circumference - (timeLeft / duration) * circumference;
+
+            progressCircle.style.strokeDasharray = circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
 
         // --- WORKOUT LOGIC ---
+        function resetWorkoutState() {
+             Object.assign(state.workout, {
+                active: false, type: null, isResting: false,
+                supersetIndex: 0, exerciseIndex: 0, set: 1,
+                isPaused: false, currentRound: 0, currentMinute: 0, emomTimeLeft: 0
+            });
+            clearInterval(state.timer.interval);
+        }
+
+
         function startWorkout() {
-            Object.assign(state.workout, { active: true, isResting: false, supersetIndex: 0, exerciseIndex: 0, set: 1 });
-            navigateTo('workout-view');
+            const day = state.selectedDay;
+            resetWorkoutState();
+            state.workout.active = true;
+
+            if (day.type === 'Strength Supersets') {
+                state.workout.type = 'superset';
+                navigateTo('workout-view');
+            } else if (day.type === 'EMOM Circuit') {
+                state.workout.type = 'emom';
+                state.workout.emomTimeLeft = day.circuit.duration_per_exercise_seconds;
+                navigateTo('workout-view');
+                startEmomTimer();
+            }
         }
 
         function endWorkout() {
+            resetWorkoutState();
             navigateTo('session-view');
         }
 
         function skipRest() {
-            clearInterval(state.timer.interval);
+            // No need to clear interval here, it's handled by the calling function
             state.workout.isResting = false;
-            renderWorkoutView();
+            renderSupersetWorkout();
         }
 
         function nextExercise() {
-            clearInterval(state.timer.interval);
+            // No need to clear interval here, it's handled by the calling function
             const day = state.selectedDay;
             if (!day || day.type !== 'Strength Supersets') return;
             
@@ -728,7 +933,7 @@
             } else {
                 state.workout.exerciseIndex++;
             }
-            renderWorkoutView();
+            renderSupersetWorkout();
         }
 
         function prevExercise() {
@@ -752,7 +957,35 @@
                 const prevSuperset = day.supersets[state.workout.supersetIndex];
                 state.workout.exerciseIndex = prevSuperset.exercises.length - 1;
             }
-            renderWorkoutView();
+            renderSupersetWorkout();
+        }
+
+        function nextEmomMinute() {
+            clearInterval(state.timer.interval);
+            const circuit = state.selectedDay.circuit;
+            state.workout.currentMinute++;
+
+            if (state.workout.currentMinute >= circuit.exercises.length) {
+                state.workout.currentMinute = 0;
+                state.workout.currentRound++;
+            }
+            
+            const totalMinutes = circuit.exercises.length * circuit.rounds;
+            const currentOverallMinute = state.workout.currentRound * circuit.exercises.length + state.workout.currentMinute;
+
+            if (currentOverallMinute >= totalMinutes) {
+                renderCompletionScreen();
+            } else {
+                state.workout.emomTimeLeft = circuit.duration_per_exercise_seconds;
+                renderEmomWorkout();
+                startEmomTimer();
+            }
+        }
+        
+        function toggleEmomPause() {
+            state.workout.isPaused = !state.workout.isPaused;
+            const btn = document.getElementById('emom-control-btn');
+            if (btn) btn.textContent = state.workout.isPaused ? "Resume" : "Pause";
         }
 
         // --- MODAL LOGIC ---
