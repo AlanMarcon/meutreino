@@ -40,6 +40,9 @@
             padding: 1rem 1.5rem;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .app-header h1 {
@@ -211,6 +214,18 @@
             font-weight: bold;
             margin: 0 0 0.5rem 0;
         }
+
+        .show-media-btn {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
         
         .timer-visual-container {
             position: relative;
@@ -241,15 +256,22 @@
         }
 
         .timer-display {
+            font-size: 6rem;
+            font-weight: bold;
+            margin: 1rem auto;
+            color: var(--primary-color);
+        }
+        
+        .timer-display.in-visual {
             position: absolute;
-            top: 50%;
+            top: 39%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 4rem; /* Adjusted for visual container */
+            font-size: 4rem;
             font-weight: bold;
             color: var(--text-color);
         }
-        
+
         .timer-display.resting {
             color: var(--rest-color);
         }
@@ -298,6 +320,57 @@
              cursor: pointer;
              margin-top: 2rem;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        }
+        
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            color: white;
+            background-color: var(--primary-color);
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            border: 2px solid white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+        }
     </style>
 </head>
 <body>
@@ -312,6 +385,15 @@
             <section id="session-view"></section>
             <section id="workout-view"></section>
         </main>
+        
+        <!-- Media Modal Structure -->
+        <div id="media-modal" class="modal-overlay">
+            <div class="modal-content">
+                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+                <img id="modal-image" src="" alt="Exercise Example"
+                     onerror="this.onerror=null;this.src='https://placehold.co/400x400/eee/ccc?text=Image+Not+Found';">
+            </div>
+        </div>
     </div>
 
     <script>
@@ -320,14 +402,14 @@
             "program": [
                 { "day": "Monday", "session": "EMS", "type": "EMS", "time_minutes": 20, "notes": "Sessão de eletroestimulação guiada em estúdio.", "exercises": [] },
                 { "day": "Tuesday", "session": "Treino A – Push & Core", "type": "Strength Supersets", "time_minutes": 45, "supersets": [
-                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Dumbbell Bench Press", "reps": "8-12", "description": "Supino com halteres focado em peito e ombros." }, { "name": "Plank Shoulder Tap", "reps": 12, "description": "Prancha alta tocando os ombros; core anti-rotação." } ] },
-                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Overhead Press", "reps": "8-12", "description": "Desenvolvimento militar em pé." }, { "name": "Hollow Hold", "reps": "30s", "description": "Isometria em hollow para core." } ] },
-                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Parallel Bar Dips (or Bench Dips)", "reps": "8-12", "description": "Tríceps e peito." }, { "name": "Ab Wheel Rollout", "reps": "8-10", "description": "Rolamento de roda para core." } ] }
+                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Dumbbell Bench Press", "reps": "8-12", "description": "Supino com halteres focado em peito e ombros.", "media": "https://placehold.co/400x400.gif?text=Bench+Press+GIF" }, { "name": "Plank Shoulder Tap", "reps": 12, "description": "Prancha alta tocando os ombros; core anti-rotação.", "media": "https://placehold.co/400x400.gif?text=Plank+Tap+GIF" } ] },
+                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Overhead Press", "reps": "8-12", "description": "Desenvolvimento militar em pé.", "media": "https://placehold.co/400x400.gif?text=OHP+GIF" }, { "name": "Hollow Hold", "reps": "30s", "description": "Isometria em hollow para core.", "media": "https://placehold.co/400x400.gif?text=Hollow+Hold+GIF" } ] },
+                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Parallel Bar Dips (or Bench Dips)", "reps": "8-12", "description": "Tríceps e peito.", "media": "https://placehold.co/400x400.gif?text=Dips+GIF" }, { "name": "Ab Wheel Rollout", "reps": "8-10", "description": "Rolamento de roda para core.", "media": "https://placehold.co/400x400.gif?text=Ab+Wheel+GIF" } ] }
                 ]},
                 { "day": "Wednesday", "session": "Treino B – Lower & Pull", "type": "Strength Supersets", "time_minutes": 45, "supersets": [
-                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Barbell Back Squat", "reps": "8-10", "description": "Agachamento livre." }, { "name": "Face Pull (Band/Cable)", "reps": 15, "description": "Estabilidade escapular." } ] },
-                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Romanian Deadlift", "reps": "8-10", "description": "Posterior de coxa e glúteos." }, { "name": "Bird-Dog", "reps": "12/lado", "description": "Core anti-rotação." } ] },
-                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Bent-Over Row", "reps": "8-12", "description": "Dorsais e bíceps." }, { "name": "Standing Calf Raise", "reps": 15, "description": "Panturrilhas." } ] }
+                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Barbell Back Squat", "reps": "8-10", "description": "Agachamento livre.", "media": "https://placehold.co/400x400.gif?text=Squat+GIF" }, { "name": "Face Pull (Band/Cable)", "reps": 15, "description": "Estabilidade escapular.", "media": "https://placehold.co/400x400.gif?text=Face+Pull+GIF" } ] },
+                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Romanian Deadlift", "reps": "8-10", "description": "Posterior de coxa e glúteos.", "media": "https://placehold.co/400x400.gif?text=RDL+GIF" }, { "name": "Bird-Dog", "reps": "12/lado", "description": "Core anti-rotação.", "media": "https://placehold.co/400x400.gif?text=Bird-Dog+GIF" } ] },
+                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Bent-Over Row", "reps": "8-12", "description": "Dorsais e bíceps.", "media": "https://placehold.co/400x400.gif?text=Row+GIF" }, { "name": "Standing Calf Raise", "reps": 15, "description": "Panturrilhas.", "media": "https://placehold.co/400x400.gif?text=Calf+Raise+GIF" } ] }
                 ]},
                 { "day": "Thursday", "session": "EMS", "type": "EMS", "time_minutes": 20, "notes": "Sessão de eletroestimulação guiada.", "exercises": [] },
                 { "day": "Friday", "session": "Active Recovery", "type": "Recovery", "time_minutes": 30, "notes": "Alongamentos, liberação miofascial ou caminhada leve.", "exercises": [] },
@@ -357,6 +439,11 @@
             weekly: document.getElementById('weekly-view'),
             session: document.getElementById('session-view'),
             workout: document.getElementById('workout-view')
+        };
+        const modal = {
+            overlay: document.getElementById('media-modal'),
+            image: document.getElementById('modal-image'),
+            closeBtn: document.getElementById('modal-close-btn')
         };
         
         // --- RENDER FUNCTIONS ---
@@ -416,13 +503,8 @@
                         </div>`;
                 });
                 html += `<button class="start-workout-btn" id="start-workout-btn">Start Workout</button>`;
-            } else if (day.type === 'EMOM Circuit') {
-                 html += `<div class="session-notes"><p>EMOM workouts are not yet interactive.</p></div>`;
             } else {
-                 html += `
-                    <div class="session-details"><p><strong>Type:</strong> ${day.type}</p>
-                    ${day.time_minutes ? `<p><strong>Duration:</strong> ${day.time_minutes} minutes</p>` : ''}</div>
-                    <div class="session-notes"><p>${day.notes}</p></div>`;
+                 html += `<div class="session-notes"><p>No workout details available.</p></div>`;
             }
             views.session.innerHTML = html;
             
@@ -442,7 +524,6 @@
                 if (superset) {
                     renderRestScreen(superset.rest_seconds);
                 } else {
-                    console.error("Could not find superset for rest period. Ending workout.");
                     endWorkout();
                 }
                 return;
@@ -452,7 +533,6 @@
             const exercise = superset?.exercises?.[state.workout.exerciseIndex];
             
             if (!exercise) {
-                console.error("Could not find exercise. Ending workout to prevent crash.");
                 endWorkout();
                 return;
             }
@@ -467,11 +547,12 @@
                         <div class="session-title"><h2>${day.session}</h2></div>
                     </div>
                     <p class="workout-progress">${progressText}</p>
-                    <h3 class="workout-exercise-name">${exercise.name}</h3>`;
+                    <h3 class="workout-exercise-name">${exercise.name}</h3>
+                    ${exercise.media ? `<button class="show-media-btn" id="show-media-btn">Show Example</button>` : ''}
+                `;
 
             if (isTimed) {
                 const duration = parseInt(exercise.reps);
-                // For timed exercises, use a simple text display for now
                 html += `<div class="timer-display">${duration}</div>
                     <div class="workout-controls">
                         <button class="workout-btn main-action-btn" id="timed-action-btn">Start</button>
@@ -489,6 +570,9 @@
             document.getElementById('back-to-session-btn').addEventListener('click', endWorkout);
             document.getElementById('end-workout-btn').addEventListener('click', endWorkout);
             
+            const showMediaBtn = document.getElementById('show-media-btn');
+            if(showMediaBtn) showMediaBtn.addEventListener('click', () => openMediaModal(exercise.media));
+
             const prevBtn = document.getElementById('prev-exercise-btn');
             if (prevBtn) prevBtn.addEventListener('click', prevExercise);
 
@@ -510,9 +594,9 @@
                     <div class="timer-visual-container">
                         <svg class="countdown-svg">
                             <circle class="countdown-bg" cx="100" cy="100" r="90"></circle>
-                            <circle class="countdown-progress" cx="100" cy="100" r="90"></circle>
+                            <circle class="countdown-progress" id="countdown-progress-circle" cx="100" cy="100" r="90"></circle>
                         </svg>
-                        <div class="timer-display resting">${duration}</div>
+                        <div class="timer-display in-visual resting" id="rest-timer-display">${duration}</div>
                     </div>
                     <div class="workout-controls">
                         <button class="workout-btn main-action-btn" id="skip-rest-btn">Skip Rest</button>
@@ -577,21 +661,26 @@
         function startRestTimer(duration) {
             clearInterval(state.timer.interval);
 
-            const progressCircle = views.workout.querySelector('.countdown-progress');
-            const timerDisplay = views.workout.querySelector('.timer-display');
+            const progressCircle = document.getElementById('countdown-progress-circle');
+            const timerDisplay = document.getElementById('rest-timer-display');
+            if (!progressCircle || !timerDisplay) return;
+
             const radius = progressCircle.r.baseVal.value;
             const circumference = 2 * Math.PI * radius;
             let timeLeft = duration;
 
             progressCircle.style.strokeDasharray = circumference;
             progressCircle.style.strokeDashoffset = 0;
-
+            
+            // Trigger the animation on the next frame
+            requestAnimationFrame(() => {
+                progressCircle.style.transition = `stroke-dashoffset ${duration}s linear`;
+                progressCircle.style.strokeDashoffset = circumference;
+            });
+            
             state.timer.interval = setInterval(() => {
                 timeLeft--;
-                const offset = circumference - (timeLeft / duration) * circumference;
-                progressCircle.style.strokeDashoffset = offset;
-                if (timerDisplay) timerDisplay.textContent = timeLeft;
-
+                if(timerDisplay) timerDisplay.textContent = timeLeft;
                 if (timeLeft <= 0) {
                     skipRest();
                 }
@@ -666,9 +755,26 @@
             renderWorkoutView();
         }
 
+        // --- MODAL LOGIC ---
+        function openMediaModal(url) {
+            modal.image.src = url;
+            modal.overlay.style.display = 'flex';
+        }
+        
+        function closeMediaModal() {
+            modal.overlay.style.display = 'none';
+            modal.image.src = ''; // Stop gif from loading in the background
+        }
+
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             navigateTo('weekly-view');
+            modal.closeBtn.addEventListener('click', closeMediaModal);
+            modal.overlay.addEventListener('click', (e) => {
+                if (e.target === modal.overlay) {
+                    closeMediaModal();
+                }
+            });
         });
     </script>
 </body>
