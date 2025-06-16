@@ -1,335 +1,675 @@
-<!-- treino-diario.html — página SPA mobile-first para acompanhamento de treinos -->
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Acompanhamento de Treino Diário</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Training Program</title>
+    <style>
+        /* CSS (Styling) */
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #F8F9FA;
+            --text-color: #333;
+            --light-text-color: #777;
+            --border-color: #E9ECEF;
+            --accent-color: #28A745;
+            --rest-color: #FFC107;
+            --background-color: #FFFFFF;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
 
-<!-- ====== CSS ====== -->
-<style>
-:root{
-  --bg:#f7f9fb;
-  --card:#ffffff;
-  --primary:#0e77cc;
-  --primary-dark:#1a3666;
-  --accent:#33db89;
-  --text:#222;
-  --radius:12px;
-  --gap:.75rem;
-  font-family:system-ui,sans-serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);line-height:1.4}
-header{position:sticky;top:0;z-index:10;background:var(--card);
-       padding:1rem;border-bottom:1px solid #e5e5e5}
-h1{font-size:1.25rem;text-align:center;color:var(--primary-dark)}
-nav{display:flex;gap:.5rem;margin-top:var(--gap);overflow-x:auto}
-nav button{flex:1;min-width:2.5rem;padding:.5rem;border:none;border-radius:var(--radius);
-           background:#e8eef2;color:var(--primary-dark);font-weight:600;white-space:nowrap;cursor:pointer}
-nav button.active{background:var(--primary);color:#fff}
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            overscroll-behavior: none;
+        }
 
-main{padding:1rem;display:flex;flex-direction:column;gap:var(--gap)}
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--background-color);
+            min-height: 100vh;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
 
-.card{background:var(--card);border-radius:var(--radius);padding:1rem;
-      box-shadow:0 2px 4px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.5rem}
-.header-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
-.badge{background:var(--accent);color:#fff;border-radius:999px;padding:.25rem .6rem;font-size:.75rem;font-weight:600}
+        .app-header {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            padding: 1rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-progress{width:100%;height:.5rem;border:none;border-radius:8px;background:#e5e5e5}
-progress::-webkit-progress-value{background:var(--primary);border-radius:8px}
+        .app-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
 
-.controls{display:flex;gap:.5rem}
-button.action{flex:1;padding:.55rem;border:none;border-radius:var(--radius);font-weight:600;cursor:pointer}
-.start{background:var(--primary);color:#fff}
-.pause{background:#ffb703;color:#000}
-.done{background:var(--accent);color:#fff}
-.timer{font-variant-numeric:tabular-nums;font-weight:600}
+        main {
+            padding: 1rem;
+        }
 
-ul.ex-list{margin-left:1rem;display:grid;row-gap:.25rem;list-style:disc}
-</style>
+        section {
+            display: none; /* Hide all sections by default */
+        }
+
+        section.active {
+            display: block; /* Show active section */
+        }
+        
+        .day-card {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        
+        .day-card.today {
+            border-left: 5px solid var(--primary-color);
+            font-weight: bold;
+        }
+
+        .day-info h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.1rem;
+        }
+
+        .day-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--light-text-color);
+        }
+        
+        .arrow {
+            font-size: 1.5rem;
+            color: var(--border-color);
+        }
+
+        .session-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            margin-right: 1rem;
+            padding: 0 0.5rem;
+        }
+        
+        .session-title h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .session-title p {
+            margin: 0;
+            color: var(--light-text-color);
+        }
+
+        .session-details p, .session-notes p {
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .superset-card, .circuit-card {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+        }
+
+        .superset-header h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        .superset-header-info {
+           display: flex;
+           justify-content: space-between;
+           color: var(--light-text-color);
+           font-size: 0.9rem;
+           margin-bottom: 1rem;
+           padding-bottom: 0.75rem;
+           border-bottom: 1px solid var(--border-color);
+        }
+        
+        .exercise {
+            margin-bottom: 1rem;
+        }
+        
+        .exercise:last-child {
+            margin-bottom: 0;
+        }
+        
+        .exercise-name {
+            font-weight: bold;
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .exercise-reps {
+            color: var(--light-text-color);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .exercise-description {
+            font-size: 0.85rem;
+            color: var(--light-text-color);
+            margin: 0;
+            font-style: italic;
+        }
+        
+        .start-workout-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+        
+        .start-workout-btn:hover {
+            background-color: #218838;
+        }
+        
+        .workout-view {
+            text-align: center;
+        }
+        
+        .workout-progress {
+            font-size: 1rem;
+            color: var(--light-text-color);
+            margin-bottom: 1rem;
+        }
+        
+        .workout-exercise-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .timer-visual-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+        }
+
+        .countdown-svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .countdown-bg, .countdown-progress {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        .countdown-bg {
+            stroke: var(--border-color);
+        }
+
+        .countdown-progress {
+            stroke: var(--rest-color);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem; /* Adjusted for visual container */
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .timer-display.resting {
+            color: var(--rest-color);
+        }
+
+        .workout-reps {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .workout-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .workout-btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid var(--primary-color);
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            min-width: 100px;
+        }
+        
+        .main-action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1.25rem 2.5rem;
+            font-size: 1.2rem;
+            transform: scale(1.1);
+        }
+        
+        .finish-workout-btn {
+             background-color: #6c757d;
+             color: white;
+             border: none;
+             width: 100%;
+             padding: 1rem;
+             font-size: 1.1rem;
+             border-radius: 8px;
+             cursor: pointer;
+             margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  <h1>Treino Diário</h1>
-  <nav id="dayTabs"></nav>
-</header>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>My Training Week</h1>
+        </header>
 
-<main id="workoutArea"></main>
+        <main>
+            <section id="weekly-view" class="active"></section>
+            <section id="session-view"></section>
+            <section id="workout-view"></section>
+        </main>
+    </div>
 
-<!-- ====== JS ====== -->
-<script>
-// ---------- Programa semanal ----------
-const schedule = {
-  Segunda: [
-    { name: "Sessão EMS", type: "time", duration: 20 * 60, sets: 1 }
-  ],
+    <script>
+        // --- DATA ---
+        const trainingData = {
+            "program": [
+                { "day": "Monday", "session": "EMS", "type": "EMS", "time_minutes": 20, "notes": "Sessão de eletroestimulação guiada em estúdio.", "exercises": [] },
+                { "day": "Tuesday", "session": "Treino A – Push & Core", "type": "Strength Supersets", "time_minutes": 45, "supersets": [
+                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Dumbbell Bench Press", "reps": "8-12", "description": "Supino com halteres focado em peito e ombros." }, { "name": "Plank Shoulder Tap", "reps": 12, "description": "Prancha alta tocando os ombros; core anti-rotação." } ] },
+                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Overhead Press", "reps": "8-12", "description": "Desenvolvimento militar em pé." }, { "name": "Hollow Hold", "reps": "30s", "description": "Isometria em hollow para core." } ] },
+                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Parallel Bar Dips (or Bench Dips)", "reps": "8-12", "description": "Tríceps e peito." }, { "name": "Ab Wheel Rollout", "reps": "8-10", "description": "Rolamento de roda para core." } ] }
+                ]},
+                { "day": "Wednesday", "session": "Treino B – Lower & Pull", "type": "Strength Supersets", "time_minutes": 45, "supersets": [
+                    { "name": "Superset A", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Barbell Back Squat", "reps": "8-10", "description": "Agachamento livre." }, { "name": "Face Pull (Band/Cable)", "reps": 15, "description": "Estabilidade escapular." } ] },
+                    { "name": "Superset B", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Romanian Deadlift", "reps": "8-10", "description": "Posterior de coxa e glúteos." }, { "name": "Bird-Dog", "reps": "12/lado", "description": "Core anti-rotação." } ] },
+                    { "name": "Superset C", "sets": 3, "rest_seconds": 60, "exercises": [ { "name": "Bent-Over Row", "reps": "8-12", "description": "Dorsais e bíceps." }, { "name": "Standing Calf Raise", "reps": 15, "description": "Panturrilhas." } ] }
+                ]},
+                { "day": "Thursday", "session": "EMS", "type": "EMS", "time_minutes": 20, "notes": "Sessão de eletroestimulação guiada.", "exercises": [] },
+                { "day": "Friday", "session": "Active Recovery", "type": "Recovery", "time_minutes": 30, "notes": "Alongamentos, liberação miofascial ou caminhada leve.", "exercises": [] },
+                { "day": "Saturday", "session": "Treino C – Full-Body Metabólico", "type": "EMOM Circuit", "time_minutes": 35, "circuit": { "format": "EMOM", "rounds": 5, "work_seconds": 45, "rest_seconds": 15, "exercises": [ {"name": "Kettlebell Swing", "reps": 15}, {"name": "Push-Up", "reps": 12}, {"name": "Goblet Squat", "reps": 15}, {"name": "TRX Row", "reps": 12}, {"name": "Jump Rope", "duration": "40s"}, {"name": "Rest / Adjust load", "duration": "15s"} ] } },
+                { "day": "Sunday", "session": "Rest", "type": "Rest", "notes": "Recuperação total.", "exercises": [] }
+            ]
+        };
 
-  Terça: [
-    { superset: "A1", name: "Supino halteres",      type: "reps", reps: "8-12",  sets: 3, rest: 60 },
-    { superset: "A2", name: "Prancha toque ombro",   type: "reps", reps: "12",    sets: 3, rest: 60 },
-    { superset: "B1", name: "Desenvolvimento militar", type: "reps", reps: "8-12", sets: 3, rest: 60 },
-    { superset: "B2", name: "Hollow hold",           type: "time", duration: 30,  sets: 3, rest: 60 },
-    { superset: "C1", name: "Fundos em banco",       type: "reps", reps: "8-12",  sets: 3, rest: 60 },
-    { superset: "C2", name: "Ab-wheel rollout",      type: "reps", reps: "8-10",  sets: 3, rest: 60 }
-  ],
+        // --- APP STATE ---
+        const state = {
+            currentView: 'weekly-view',
+            selectedDay: null,
+            workout: {
+                active: false,
+                isResting: false,
+                supersetIndex: 0,
+                exerciseIndex: 0,
+                set: 1,
+            },
+            timer: {
+                interval: null,
+            }
+        };
 
-  Quarta: [
-    { superset: "A1", name: "Agachamento livre",     type: "reps", reps: "8-10",     sets: 3, rest: 60 },
-    { superset: "A2", name: "Face pull",             type: "reps", reps: "15",       sets: 3, rest: 60 },
-    { superset: "B1", name: "RDL",                   type: "reps", reps: "8-10",     sets: 3, rest: 60 },
-    { superset: "B2", name: "Bird-dog",              type: "reps", reps: "12/lado",  sets: 3, rest: 60 },
-    { superset: "C1", name: "Remada curvada",        type: "reps", reps: "8-12",     sets: 3, rest: 60 },
-    { superset: "C2", name: "Panturrilha em pé",     type: "reps", reps: "15",       sets: 3, rest: 60 }
-  ],
+        // --- DOM ELEMENT CACHE ---
+        const views = {
+            weekly: document.getElementById('weekly-view'),
+            session: document.getElementById('session-view'),
+            workout: document.getElementById('workout-view')
+        };
+        
+        // --- RENDER FUNCTIONS ---
+        function renderWeeklyView() {
+            const today = new Date().toLocaleString('en-US', { weekday: 'long' });
+            let html = '';
+            trainingData.program.forEach(day => {
+                const isToday = day.day === today;
+                html += `
+                    <div class="day-card ${isToday ? 'today' : ''}" data-day="${day.day}">
+                        <div class="day-info">
+                            <h3>${day.day}</h3>
+                            <p>${day.session}</p>
+                        </div>
+                        <span class="arrow">&rsaquo;</span>
+                    </div>`;
+            });
+            views.weekly.innerHTML = html;
 
-  Quinta: [
-    { name: "Sessão EMS", type: "time", duration: 20 * 60, sets: 1 }
-  ],
-
-  Sexta: [
-    { name: "Mobilidade / caminhada", type: "time", duration: 30 * 60, sets: 1 }
-  ],
-
-  Sábado: {
-    mode: "emom",
-    rounds: 5,
-    minute: 60,           // 60 s por estação
-    exercises: [
-      { name: "Kettlebell swing", reps: "15" },
-      { name: "Push-up",          reps: "12" },
-      { name: "Goblet squat",     reps: "15" },
-      { name: "Remada TRX",       reps: "12" },
-      { name: "Jump rope",        reps: "40 s" },
-      { name: "Descanso",         reps: "—" }
-    ]
-  },
-
-  Domingo: []             // descanso total
-};
-
-// ---------- Abas de dias ----------
-const dayTabs     = document.getElementById('dayTabs');
-const workoutArea = document.getElementById('workoutArea');
-const dias        = Object.keys(schedule);
-
-dias.forEach((dia, idx) => {
-  const btn = document.createElement('button');
-  btn.textContent = dia.slice(0,3);
-  if (idx === new Date().getDay()) btn.classList.add('active');
-
-  btn.addEventListener('click', () => {
-    [...dayTabs.children].forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderDay(dia);
-  });
-
-  dayTabs.appendChild(btn);
-});
-
-// exibe o dia corrente ao abrir
-renderDay(dias[new Date().getDay()]);
-
-// ---------- Renderização ----------
-function renderDay(dia) {
-  workoutArea.innerHTML = '';
-  const plan = schedule[dia];
-
-  if (Array.isArray(plan)) {        // treino normal
-    if (!plan.length) {
-      workoutArea.innerHTML = '<p>Nenhum treino 🙌</p>';
-      return;
-    }
-    plan.forEach(ex => workoutArea.appendChild(createCard(ex)));
-  } else if (plan.mode === 'emom') { // EMOM
-    workoutArea.appendChild(createEmomCard(plan));
-  }
-}
-
-// ---------- Cartão de exercício padrão ----------
-function createCard(ex) {
-  let state = 'idle',
-      currentSet = 0,
-      timeLeft = ex.duration || 0,
-      timerId = null,
-      restId  = null;
-
-  const card   = el('div','card');
-  const header = el('div','header-row');
-  const title  = el('h3'); title.textContent = ex.name;
-
-  if (ex.superset) {
-    const badge = el('span','badge'); badge.textContent = ex.superset;
-    header.append(title, badge);
-  } else {
-    header.appendChild(title);
-  }
-
-  const info = el('p');
-  info.innerHTML = ex.type === 'time'
-      ? `${ex.sets}×${ex.duration}s`
-      : `${ex.sets}×${ex.reps}`;
-
-  const prog = document.createElement('progress');
-  prog.max   = ex.sets;
-  prog.value = 0;
-
-  // botões
-  const controls = el('div','controls');
-  const btnS = btn('Iniciar','start');
-  const btnP = btn('Pausar','pause'); btnP.disabled = true;
-  const btnD = btn('✔','done');      btnD.disabled = true;
-  const lbl  = el('span','timer');
-
-  btnS.onclick = () => {
-    if (state === 'running') return;
-
-    // cancela descanso se estiver rolando
-    if (state === 'rest') {
-      clearInterval(restId);
-      restId = null;
-      lbl.textContent = '';
-    }
-
-    if (currentSet >= ex.sets) return;
-
-    state = 'running';
-    btnS.disabled = true; btnP.disabled = false; btnD.disabled = false;
-
-    if (ex.type === 'time') {
-      timeLeft = ex.duration;
-      lbl.textContent = fmt(timeLeft);
-      timerId = setInterval(() => {
-        timeLeft--;
-        lbl.textContent = fmt(timeLeft);
-        if (timeLeft <= 0) {
-          clearInterval(timerId);
-          finishSet();
+            document.querySelectorAll('.day-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const dayName = e.currentTarget.dataset.day;
+                    const dayData = trainingData.program.find(d => d.day === dayName);
+                    if (dayData) {
+                        state.selectedDay = dayData;
+                        navigateTo('session-view');
+                    }
+                });
+            });
         }
-      }, 1000);
-    } else {
-      lbl.textContent = `Reps: ${ex.reps}`;
-    }
-  };
 
-  btnP.onclick = () => {
-    if (state !== 'running') return;
-    state = 'paused';
-    clearInterval(timerId);
-    btnS.disabled = false; btnP.disabled = true;
-  };
-
-  btnD.onclick = finishSet;
-
-  function finishSet() {
-    if (state === 'idle') return;
-
-    clearInterval(timerId);
-    timerId = null;
-
-    currentSet++;
-    prog.value = currentSet;
-
-    if (currentSet >= ex.sets) {
-      state = 'done';
-      [btnS,btnP,btnD].forEach(b => b.disabled = true);
-      lbl.textContent = '✔';
-    } else {
-      state = 'rest';
-      btnS.disabled = false; btnP.disabled = true; btnD.disabled = true;
-
-      let rest = ex.rest || 60;
-      lbl.textContent = `Descanso: ${fmt(rest)}`;
-      restId = setInterval(() => {
-        rest--;
-        lbl.textContent = `Descanso: ${fmt(rest)}`;
-        if (rest <= 0) {
-          clearInterval(restId);
-          restId = null;
-          btnS.click();   // inicia próximo set automaticamente
+        function renderSessionView() {
+            const day = state.selectedDay;
+            let html = `
+                <div class="session-header">
+                    <button class="back-button" id="back-to-week-btn">&lsaquo;</button>
+                    <div class="session-title"><h2>${day.day}</h2><p>${day.session}</p></div>
+                </div>`;
+            
+            if (day.type === "Strength Supersets" && day.supersets?.length) {
+                day.supersets.forEach(superset => {
+                    html += `
+                        <div class="superset-card">
+                            <div class="superset-header">
+                                <h4>${superset.name}</h4>
+                                <div class="superset-header-info">
+                                    <span>${superset.sets} SETS</span>
+                                    <span>${superset.rest_seconds}s REST</span>
+                                </div>
+                            </div>
+                            ${(superset.exercises || []).map(ex => `
+                                <div class="exercise">
+                                    <p class="exercise-name">${ex.name}</p>
+                                    <p class="exercise-reps">Reps: ${ex.reps}</p>
+                                    <p class="exercise-description">${ex.description}</p>
+                                </div>`).join('')}
+                        </div>`;
+                });
+                html += `<button class="start-workout-btn" id="start-workout-btn">Start Workout</button>`;
+            } else if (day.type === 'EMOM Circuit') {
+                 html += `<div class="session-notes"><p>EMOM workouts are not yet interactive.</p></div>`;
+            } else {
+                 html += `
+                    <div class="session-details"><p><strong>Type:</strong> ${day.type}</p>
+                    ${day.time_minutes ? `<p><strong>Duration:</strong> ${day.time_minutes} minutes</p>` : ''}</div>
+                    <div class="session-notes"><p>${day.notes}</p></div>`;
+            }
+            views.session.innerHTML = html;
+            
+            document.getElementById('back-to-week-btn').addEventListener('click', () => navigateTo('weekly-view'));
+            const startBtn = document.getElementById('start-workout-btn');
+            if (startBtn) {
+                startBtn.addEventListener('click', startWorkout);
+            }
         }
-      }, 1000);
-    }
-  }
 
-  controls.append(btnS,btnP,btnD,lbl);
-  card.append(header,info,prog,controls);
-  return card;
-}
+        function renderWorkoutView() {
+            clearInterval(state.timer.interval);
+            const day = state.selectedDay;
 
-// ---------- Cartão EMOM ----------
-function createEmomCard(plan) {
-  const totalSecs = plan.rounds * plan.minute * plan.exercises.length;
-  let timeLeft = totalSecs,
-      state    = 'idle',
-      timerId  = null;
+            if (state.workout.isResting) {
+                const superset = day.supersets?.[state.workout.supersetIndex];
+                if (superset) {
+                    renderRestScreen(superset.rest_seconds);
+                } else {
+                    console.error("Could not find superset for rest period. Ending workout.");
+                    endWorkout();
+                }
+                return;
+            }
 
-  const card   = el('div','card');
-  const header = el('div','header-row');
-  const title  = el('h3'); title.textContent = `Circuito EMOM – ${plan.rounds} rodadas`;
-  header.appendChild(title);
+            const superset = day.supersets?.[state.workout.supersetIndex];
+            const exercise = superset?.exercises?.[state.workout.exerciseIndex];
+            
+            if (!exercise) {
+                console.error("Could not find exercise. Ending workout to prevent crash.");
+                endWorkout();
+                return;
+            }
 
-  const info = el('p'); info.textContent = `Tempo total: ${Math.floor(totalSecs/60)} min`;
+            const progressText = `Set ${state.workout.set}/${superset.sets} | Superset ${state.workout.supersetIndex + 1}/${day.supersets.length}`;
+            const isTimed = typeof exercise.reps === 'string' && exercise.reps.endsWith('s');
+            
+            let html = `
+                <div class="workout-view">
+                    <div class="session-header">
+                        <button class="back-button" id="back-to-session-btn">&lsaquo;</button>
+                        <div class="session-title"><h2>${day.session}</h2></div>
+                    </div>
+                    <p class="workout-progress">${progressText}</p>
+                    <h3 class="workout-exercise-name">${exercise.name}</h3>`;
 
-  const list = el('ul','ex-list');
-  plan.exercises.forEach((ex,i) => {
-    const li = document.createElement('li');
-    li.textContent = `${i+1}. ${ex.name} – ${ex.reps}`;
-    list.appendChild(li);
-  });
+            if (isTimed) {
+                const duration = parseInt(exercise.reps);
+                // For timed exercises, use a simple text display for now
+                html += `<div class="timer-display">${duration}</div>
+                    <div class="workout-controls">
+                        <button class="workout-btn main-action-btn" id="timed-action-btn">Start</button>
+                    </div>`;
+            } else {
+                html += `<div class="workout-reps">${exercise.reps}</div>
+                    <div class="workout-controls">
+                        <button class="workout-btn" id="prev-exercise-btn">Prev</button>
+                        <button class="workout-btn main-action-btn" id="next-exercise-btn">Done</button>
+                    </div>`;
+            }
+            html += `<button class="finish-workout-btn" id="end-workout-btn">End Workout</button></div>`;
+            views.workout.innerHTML = html;
 
-  // controles
-  const controls = el('div','controls');
-  const btnS = btn('Iniciar','start');
-  const btnP = btn('Pausar','pause'); btnP.disabled = true;
-  const lbl  = el('span','timer');    controls.append(btnS,btnP,lbl);
+            document.getElementById('back-to-session-btn').addEventListener('click', endWorkout);
+            document.getElementById('end-workout-btn').addEventListener('click', endWorkout);
+            
+            const prevBtn = document.getElementById('prev-exercise-btn');
+            if (prevBtn) prevBtn.addEventListener('click', prevExercise);
 
-  btnS.onclick = () => {
-    if (state === 'running') return;
-    state = 'running';
-    btnS.disabled = true; btnP.disabled = false;
+            const nextBtn = document.getElementById('next-exercise-btn');
+            if (nextBtn) nextBtn.addEventListener('click', nextExercise);
 
-    lbl.textContent = fmt(timeLeft);
-    timerId = setInterval(() => {
-      timeLeft--;
-      lbl.textContent = fmt(timeLeft);
-      if (timeLeft <= 0) {
-        clearInterval(timerId);
-        state = 'done';
-        lbl.textContent = '✔';
-        btnP.disabled = true;
-      }
-    }, 1000);
-  };
+            const timedBtn = document.getElementById('timed-action-btn');
+            if (timedBtn) {
+                 const duration = parseInt(exercise.reps);
+                 timedBtn.addEventListener('click', () => startExerciseTimer(duration));
+            }
+        }
 
-  btnP.onclick = () => {
-    if (state !== 'running') return;
-    state = 'paused';
-    clearInterval(timerId);
-    btnS.disabled = false; btnP.disabled = true;
-  };
+        function renderRestScreen(duration) {
+            let html = `
+                <div class="workout-view">
+                    <p class="workout-progress">Next set coming up...</p>
+                    <h3 class="workout-exercise-name">REST</h3>
+                    <div class="timer-visual-container">
+                        <svg class="countdown-svg">
+                            <circle class="countdown-bg" cx="100" cy="100" r="90"></circle>
+                            <circle class="countdown-progress" cx="100" cy="100" r="90"></circle>
+                        </svg>
+                        <div class="timer-display resting">${duration}</div>
+                    </div>
+                    <div class="workout-controls">
+                        <button class="workout-btn main-action-btn" id="skip-rest-btn">Skip Rest</button>
+                    </div>
+                    <button class="finish-workout-btn" id="end-workout-btn-rest">End Workout</button>
+                </div>`;
+            views.workout.innerHTML = html;
 
-  card.append(header,info,list,controls);
-  return card;
-}
+            document.getElementById('skip-rest-btn').addEventListener('click', skipRest);
+            document.getElementById('end-workout-btn-rest').addEventListener('click', endWorkout);
+            startRestTimer(duration);
+        }
+        
+        function renderCompletionScreen() {
+             let html = `
+                <div class="workout-view">
+                    <h3 class="workout-exercise-name">Workout Complete!</h3>
+                    <p class="workout-progress">Great job!</p>
+                     <div class="workout-controls">
+                        <button class="workout-btn main-action-btn" id="back-to-home-btn">Done</button>
+                    </div>
+                </div>`;
+            views.workout.innerHTML = html;
+            document.getElementById('back-to-home-btn').addEventListener('click', () => navigateTo('weekly-view'));
+        }
 
-// ---------- utilitários ----------
-function el(tag, cls='') {
-  const n = document.createElement(tag);
-  if (cls) n.className = cls;
-  return n;
-}
-function btn(txt, cls) {
-  const b = el('button',`action ${cls}`);
-  b.textContent = txt;
-  return b;
-}
-function fmt(s) {
-  const m  = String(Math.floor(s/60)).padStart(2,'0');
-  const ss = String(s%60).padStart(2,'0');
-  return `${m}:${ss}`;
-}
-</script>
+        // --- NAVIGATION ---
+        function navigateTo(viewId) {
+            state.currentView = viewId;
+            clearInterval(state.timer.interval);
+            
+            for (const key in views) {
+                views[key].classList.toggle('active', key === viewId.replace('-view', ''));
+            }
+
+            switch(viewId) {
+                case 'weekly-view': renderWeeklyView(); break;
+                case 'session-view': renderSessionView(); break;
+                case 'workout-view': renderWorkoutView(); break;
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // --- TIMER LOGIC ---
+        function startExerciseTimer(duration) {
+            clearInterval(state.timer.interval);
+            let timeLeft = duration;
+            const timerDisplay = views.workout.querySelector('.timer-display');
+            const actionButton = views.workout.querySelector('#timed-action-btn');
+            actionButton.textContent = 'Skip';
+            actionButton.onclick = nextExercise;
+
+            state.timer.interval = setInterval(() => {
+                timeLeft--;
+                if(timerDisplay) timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    nextExercise();
+                }
+            }, 1000);
+        }
+
+        function startRestTimer(duration) {
+            clearInterval(state.timer.interval);
+
+            const progressCircle = views.workout.querySelector('.countdown-progress');
+            const timerDisplay = views.workout.querySelector('.timer-display');
+            const radius = progressCircle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            let timeLeft = duration;
+
+            progressCircle.style.strokeDasharray = circumference;
+            progressCircle.style.strokeDashoffset = 0;
+
+            state.timer.interval = setInterval(() => {
+                timeLeft--;
+                const offset = circumference - (timeLeft / duration) * circumference;
+                progressCircle.style.strokeDashoffset = offset;
+                if (timerDisplay) timerDisplay.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    skipRest();
+                }
+            }, 1000);
+        }
+
+        // --- WORKOUT LOGIC ---
+        function startWorkout() {
+            Object.assign(state.workout, { active: true, isResting: false, supersetIndex: 0, exerciseIndex: 0, set: 1 });
+            navigateTo('workout-view');
+        }
+
+        function endWorkout() {
+            navigateTo('session-view');
+        }
+
+        function skipRest() {
+            clearInterval(state.timer.interval);
+            state.workout.isResting = false;
+            renderWorkoutView();
+        }
+
+        function nextExercise() {
+            clearInterval(state.timer.interval);
+            const day = state.selectedDay;
+            if (!day || day.type !== 'Strength Supersets') return;
+            
+            const superset = day.supersets[state.workout.supersetIndex];
+            const isLastExerciseInSet = state.workout.exerciseIndex >= superset.exercises.length - 1;
+
+            if (isLastExerciseInSet) {
+                state.workout.exerciseIndex = 0;
+                state.workout.set++;
+                
+                if (state.workout.set > superset.sets) {
+                    state.workout.set = 1;
+                    state.workout.supersetIndex++;
+                    
+                    if (state.workout.supersetIndex >= day.supersets.length) {
+                        renderCompletionScreen();
+                        return;
+                    }
+                }
+                state.workout.isResting = true;
+            } else {
+                state.workout.exerciseIndex++;
+            }
+            renderWorkoutView();
+        }
+
+        function prevExercise() {
+            clearInterval(state.timer.interval);
+            state.workout.isResting = false;
+            const day = state.selectedDay;
+            if (!day) return;
+
+            state.workout.exerciseIndex--;
+            if (state.workout.exerciseIndex < 0) {
+                const currentSupersetIndex = state.workout.supersetIndex;
+                const currentSet = state.workout.set;
+
+                if (currentSet > 1) {
+                    state.workout.set--;
+                } else if (currentSupersetIndex > 0) {
+                    state.workout.supersetIndex--;
+                    const prevSuperset = day.supersets[state.workout.supersetIndex];
+                    state.workout.set = prevSuperset.sets;
+                }
+                const prevSuperset = day.supersets[state.workout.supersetIndex];
+                state.workout.exerciseIndex = prevSuperset.exercises.length - 1;
+            }
+            renderWorkoutView();
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            navigateTo('weekly-view');
+        });
+    </script>
 </body>
 </html>
